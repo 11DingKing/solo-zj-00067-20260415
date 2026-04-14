@@ -1,0 +1,54 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    container_name: express-mongodb-api
+    restart: always
+    ports:
+      - "8000:8000"
+    depends_on:
+      - mongodb
+      - redis
+    environment:
+      APP_PORT: 8000
+      APP_URL: http://localhost:8000
+      CLIENT_URL: http://localhost:3000
+      MONGODB_URI: mongodb://mongodb:27017/express-api
+      REDIS_URI: redis://redis:6379
+      REDIS_TOKEN_EXPIRATION: 86400
+      JWT_SECRET: my_jwt_secret_key
+      JWT_EXPIRATION: 24h
+      MAIL_HOST: mailhog
+      MAIL_PORT: 1025
+      MAIL_USER: ""
+      MAIL_PASSWORD: ""
+      MAIL_TPL_PATH: templates
+      STORAGE_PATH: storage/public
+      API_LOG_FILENAME: api-logs.log
+
+  mongodb:
+    image: mongo:6
+    container_name: express-mongodb
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
+  redis:
+    image: redis:7-alpine
+    container_name: express-redis
+    restart: always
+    ports:
+      - "6379:6379"
+
+  mailhog:
+    image: mailhog/mailhog
+    container_name: express-mailhog
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+
+volumes:
+  mongo_data:
