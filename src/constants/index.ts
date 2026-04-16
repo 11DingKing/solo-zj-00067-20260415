@@ -1,6 +1,19 @@
 export enum ExpiresInDays {
-  Verification = 7,
-  ResetPassword = 7
+  Verification = 7
+}
+
+export enum ExpiresInMinutes {
+  ResetPassword = 30
+}
+
+export enum ExpiresInSeconds {
+  ResetPasswordRateLimit = 3600,
+  UsedResetToken = 1800
+}
+
+export enum RedisKeyPrefix {
+  UsedResetToken = 'usedResetToken:',
+  ResetPasswordRateLimit = 'resetPasswordRateLimit:'
 }
 
 export enum Mimetype {

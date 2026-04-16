@@ -3,7 +3,12 @@ import { startSession } from 'mongoose'
 import { StatusCodes, ReasonPhrases } from 'http-status-codes'
 import winston from 'winston'
 
-import { ExpiresInDays } from '@/constants'
+import {
+  ExpiresInDays,
+  ExpiresInMinutes,
+  ExpiresInSeconds,
+  RedisKeyPrefix
+} from '@/constants'
 import {
   NewPasswordPayload,
   ResetPasswordPayload,
@@ -23,7 +28,10 @@ import {
   IUserRequest
 } from '@/contracts/request'
 import { createCryptoString } from '@/utils/cryptoString'
-import { createDateAddDaysFromNow } from '@/utils/dates'
+import {
+  createDateAddDaysFromNow,
+  createDateAddMinutesFromNow
+} from '@/utils/dates'
 import { UserMail } from '@/mailer'
 import { createHash } from '@/utils/hash'
 import { redis } from '@/dataSources'
@@ -172,8 +180,19 @@ export const authController = {
     res: Response
   ) => {
     const session = await startSession()
+    const rateLimitKey = `${RedisKeyPrefix.ResetPasswordRateLimit}${email}`
 
     try {
+      const currentCount = await redis.client.get(rateLimitKey)
+      const count = currentCount ? parseInt(currentCount, 10) : 0
+
+      if (count >= 3) {
+        return res.status(StatusCodes.TOO_MANY_REQUESTS).json({
+          message: 'Too many password reset requests. Please try again later.',
+          status: StatusCodes.TOO_MANY_REQUESTS
+        })
+      }
+
       const user = await userService.getByEmail(email)
 
       if (!user) {
@@ -187,7 +206,9 @@ export const authController = {
 
       const cryptoString = createCryptoString()
 
-      const dateFromNow = createDateAddDaysFromNow(ExpiresInDays.ResetPassword)
+      const dateFromNow = createDateAddMinutesFromNow(
+        ExpiresInMinutes.ResetPassword
+      )
 
       const resetPassword = await resetPasswordService.create(
         {
@@ -211,6 +232,11 @@ export const authController = {
       userMail.resetPassword({
         email: user.email,
         accessToken: cryptoString
+      })
+
+      await redis.client.set(rateLimitKey, count + 1, {
+        EX: ExpiresInSeconds.ResetPasswordRateLimit,
+        NX: false
       })
 
       await session.commitTransaction()
@@ -242,7 +268,17 @@ export const authController = {
     res: Response
   ) => {
     const session = await startSession()
+    const usedTokenKey = `${RedisKeyPrefix.UsedResetToken}${params.accessToken}`
+
     try {
+      const isTokenUsed = await redis.client.get(usedTokenKey)
+      if (isTokenUsed) {
+        return res.status(StatusCodes.FORBIDDEN).json({
+          message: 'Reset token has already been used.',
+          status: StatusCodes.FORBIDDEN
+        })
+      }
+
       const resetPassword = await resetPasswordService.getByValidAccessToken(
         params.accessToken
       )
@@ -280,6 +316,11 @@ export const authController = {
 
       userMail.successfullyUpdatedPassword({
         email: user.email
+      })
+
+      await redis.client.set(usedTokenKey, '1', {
+        EX: ExpiresInSeconds.UsedResetToken,
+        NX: true
       })
 
       await session.commitTransaction()

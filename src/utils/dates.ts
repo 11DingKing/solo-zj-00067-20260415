@@ -6,6 +6,14 @@ export const createDateAddDaysFromNow = (days: number) => {
   return date
 }
 
+export const createDateAddMinutesFromNow = (minutes: number) => {
+  const date = new Date()
+
+  date.setMinutes(date.getMinutes() + minutes)
+
+  return date
+}
+
 export const createDateNow = () => {
   const date = new Date()
 

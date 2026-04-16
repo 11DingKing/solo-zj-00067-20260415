@@ -11,6 +11,22 @@ import {
 } from '@/contracts/auth'
 import { IBodyRequest } from '@/contracts/request'
 
+const isPasswordStrong = (password: string): boolean => {
+  if (!validator.isLength(password, { min: 8, max: 48 })) {
+    return false
+  }
+  if (!/[a-z]/.test(password)) {
+    return false
+  }
+  if (!/[A-Z]/.test(password)) {
+    return false
+  }
+  if (!/[0-9]/.test(password)) {
+    return false
+  }
+  return true
+}
+
 export const authValidation = {
   signIn: (
     req: IBodyRequest<SignInPayload>,
@@ -63,10 +79,11 @@ export const authValidation = {
       if (
         !req.body.email ||
         !req.body.password ||
-        !validator.isLength(req.body.password, { min: 6, max: 48 })
+        !isPasswordStrong(req.body.password)
       ) {
         return res.status(StatusCodes.BAD_REQUEST).json({
-          message: ReasonPhrases.BAD_REQUEST,
+          message:
+            'Password must be at least 8 characters long and contain uppercase, lowercase letters and numbers.',
           status: StatusCodes.BAD_REQUEST
         })
       }
@@ -147,12 +164,10 @@ export const authValidation = {
     next: NextFunction
   ) => {
     try {
-      if (
-        !req.body.password ||
-        !validator.isLength(req.body.password, { min: 6, max: 48 })
-      ) {
+      if (!req.body.password || !isPasswordStrong(req.body.password)) {
         return res.status(StatusCodes.BAD_REQUEST).json({
-          message: ReasonPhrases.BAD_REQUEST,
+          message:
+            'Password must be at least 8 characters long and contain uppercase, lowercase letters and numbers.',
           status: StatusCodes.BAD_REQUEST
         })
       }

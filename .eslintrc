@@ -58,5 +58,14 @@
     "no-unused-vars": "off",
     "@typescript-eslint/no-unused-vars": "error"
   },
-  "ignorePatterns": ["node_modules/"]
+  "ignorePatterns": ["node_modules/"],
+  "overrides": [
+    {
+      "files": ["**/tests/**/*.ts", "**/*.test.ts"],
+      "rules": {
+        "@typescript-eslint/no-explicit-any": "off",
+        "no-console": "off"
+      }
+    }
+  ]
 }
