@@ -20,9 +20,7 @@ import { ExpiresInSeconds, RedisKeyPrefix } from '@/constants'
 jest.mock('@/services')
 jest.mock('@/dataSources')
 
-const mockUserId = new ObjectId(
-  '507f1f77bcf86cd799439011'
-) as unknown as ObjectId
+const mockUserId = new ObjectId('507f1f77bcf86cd799439011') as unknown as ObjectId
 
 const createMockUser = (overrides = {}) => ({
   id: mockUserId,
@@ -141,9 +139,7 @@ describe('authController', () => {
         mockResponse as Response
       )
 
-      expect(userService.isExistByEmail).toHaveBeenCalledWith(
-        'newuser@example.com'
-      )
+      expect(userService.isExistByEmail).toHaveBeenCalledWith('newuser@example.com')
       expect(userService.create).toHaveBeenCalled()
       expect(verificationService.create).toHaveBeenCalled()
       expect(statusMock).toHaveBeenCalledWith(StatusCodes.OK)
@@ -290,9 +286,9 @@ describe('authController', () => {
         accessToken: mockAccessToken
       }
       ;(redis.client.get as jest.Mock).mockResolvedValue(null)
-      ;(
-        resetPasswordService.getByValidAccessToken as jest.Mock
-      ).mockResolvedValue(mockResetPassword)
+      ;(resetPasswordService.getByValidAccessToken as jest.Mock).mockResolvedValue(
+        mockResetPassword
+      )
       ;(userService.getById as jest.Mock).mockResolvedValue(mockUser)
 
       const mockRequest: Partial<ICombinedRequest<any, any, any>> = {
@@ -362,9 +358,7 @@ describe('authController', () => {
 
     it('should return FORBIDDEN when token is invalid or expired', async () => {
       ;(redis.client.get as jest.Mock).mockResolvedValue(null)
-      ;(
-        resetPasswordService.getByValidAccessToken as jest.Mock
-      ).mockResolvedValue(null)
+      ;(resetPasswordService.getByValidAccessToken as jest.Mock).mockResolvedValue(null)
 
       const mockRequest: Partial<ICombinedRequest<any, any, any>> = {
         body: {
@@ -393,9 +387,9 @@ describe('authController', () => {
         accessToken: mockAccessToken
       }
       ;(redis.client.get as jest.Mock).mockResolvedValue(null)
-      ;(
-        resetPasswordService.getByValidAccessToken as jest.Mock
-      ).mockResolvedValue(mockResetPassword)
+      ;(resetPasswordService.getByValidAccessToken as jest.Mock).mockResolvedValue(
+        mockResetPassword
+      )
       ;(userService.getById as jest.Mock).mockResolvedValue(null)
 
       const mockRequest: Partial<ICombinedRequest<any, any, any>> = {

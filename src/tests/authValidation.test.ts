@@ -52,8 +52,7 @@ describe('authValidation', () => {
 
       expect(mockResponse.status).toHaveBeenCalledWith(StatusCodes.BAD_REQUEST)
       expect(jsonMock).toHaveBeenCalledWith({
-        message:
-          'Password must be at least 8 characters long and contain uppercase, lowercase letters and numbers.',
+        message: 'Password must be at least 8 characters long and contain uppercase, lowercase letters and numbers.',
         status: StatusCodes.BAD_REQUEST
       })
       expect(mockNext).not.toHaveBeenCalled()
@@ -182,8 +181,7 @@ describe('authValidation', () => {
 
       expect(mockResponse.status).toHaveBeenCalledWith(StatusCodes.BAD_REQUEST)
       expect(jsonMock).toHaveBeenCalledWith({
-        message:
-          'Password must be at least 8 characters long and contain uppercase, lowercase letters and numbers.',
+        message: 'Password must be at least 8 characters long and contain uppercase, lowercase letters and numbers.',
         status: StatusCodes.BAD_REQUEST
       })
       expect(mockNext).not.toHaveBeenCalled()

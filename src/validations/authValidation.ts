@@ -164,10 +164,12 @@ export const authValidation = {
     next: NextFunction
   ) => {
     try {
-      if (!req.body.password || !isPasswordStrong(req.body.password)) {
+      if (
+        !req.body.password ||
+        !isPasswordStrong(req.body.password)
+      ) {
         return res.status(StatusCodes.BAD_REQUEST).json({
-          message:
-            'Password must be at least 8 characters long and contain uppercase, lowercase letters and numbers.',
+          message: 'Password must be at least 8 characters long and contain uppercase, lowercase letters and numbers.',
           status: StatusCodes.BAD_REQUEST
         })
       }

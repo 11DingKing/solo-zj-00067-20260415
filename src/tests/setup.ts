@@ -35,7 +35,7 @@ jest.mock('@/utils/jwt', () => ({
 }))
 
 jest.mock('@/utils/hash', () => ({
-  createHash: jest.fn(password => `hashed-${password}`)
+  createHash: jest.fn((password) => `hashed-${password}`)
 }))
 
 jest.mock('@/utils/cryptoString', () => ({
